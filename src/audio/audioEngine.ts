@@ -42,8 +42,9 @@ export function playNote(midi: number): void {
 export function playScaleAscending(notes: AbsoluteNote[]): void {
   const ctx = getAudioContext();
   const midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
+  const resolvedMidiNotes = [...midiNotes, midiNotes[0] + 12];
   const noteDuration = 0.28;
-  midiNotes.forEach((midi, i) => playTone(ctx, midi, ctx.currentTime + i * noteDuration, noteDuration * 1.5));
+  resolvedMidiNotes.forEach((midi, i) => playTone(ctx, midi, ctx.currentTime + i * noteDuration, noteDuration * 1.5));
 }
 
 export function playChord(notes: AbsoluteNote[]): void {
