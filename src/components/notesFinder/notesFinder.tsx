@@ -112,7 +112,9 @@ export default function () {
             categoryLabel="Category"
           />
         </div>
-        {hasEnoughNotes ? (
+        {!hasEnoughNotes ? (
+          <p>Select at least two notes to see matching scales.</p>
+        ) : matchingScales.length > 0 ? (
           <ul>
             {matchingScales.map(({ def, rootPitchClass }) => (
               <li
@@ -124,7 +126,7 @@ export default function () {
             ))}
           </ul>
         ) : (
-          <p>Select at least two notes to see matching scales.</p>
+          <p>No scales contain all of the selected notes.</p>
         )}
       </div>
 
@@ -137,7 +139,9 @@ export default function () {
             categoryLabel="Family"
           />
         </div>
-        {hasEnoughNotes ? (
+        {!hasEnoughNotes ? (
+          <p>Select at least two notes to see matching chords.</p>
+        ) : matchingChords.length > 0 ? (
           <ul>
             {matchingChords.map(({ def, rootPitchClass }) => (
               <li
@@ -149,7 +153,7 @@ export default function () {
             ))}
           </ul>
         ) : (
-          <p>Select at least two notes to see matching chords.</p>
+          <p>No chords contain all of the selected notes.</p>
         )}
       </div>
     </article>

@@ -92,39 +92,43 @@ export default function () {
           categoryLabel="Category"
         />
       </div>
-      <ul>
-        {relationships.map((rel) => {
-          const scaleType = RELATIVE_SCALES.find((s) => s.id === rel.scaleId)!;
-          const chordDegreeOffset = mod(-rel.scaleRootPitchClass, 12);
-          const degreeIndex = scaleType.intervals.indexOf(chordDegreeOffset);
-          const degreeLabels = getRelativeScaleDegreeLabels(scaleType);
+      {relationships.length > 0 ? (
+        <ul>
+          {relationships.map((rel) => {
+            const scaleType = RELATIVE_SCALES.find((s) => s.id === rel.scaleId)!;
+            const chordDegreeOffset = mod(-rel.scaleRootPitchClass, 12);
+            const degreeIndex = scaleType.intervals.indexOf(chordDegreeOffset);
+            const degreeLabels = getRelativeScaleDegreeLabels(scaleType);
 
-          if (isAbsolute) {
-            const scaleRootPc = mod(state.rootPitchClass + rel.scaleRootPitchClass, 12);
-            const scaleRootSpelling = ROOTS[scaleRootPc].spellings[0];
+            if (isAbsolute) {
+              const scaleRootPc = mod(state.rootPitchClass + rel.scaleRootPitchClass, 12);
+              const scaleRootSpelling = ROOTS[scaleRootPc].spellings[0];
+              return (
+                <li
+                  key={`${rel.scaleId}-${rel.scaleRootPitchClass}`}
+                  onClick={() => {
+                    dispatch({ type: 'SET_ROOT', rootPitchClass: scaleRootPc });
+                    navigate(`/scale/${rel.scaleId}`);
+                  }}
+                >
+                  {spellingToString(scaleRootSpelling)} {scaleType.name}
+                </li>
+              );
+            }
+
             return (
               <li
                 key={`${rel.scaleId}-${rel.scaleRootPitchClass}`}
-                onClick={() => {
-                  dispatch({ type: 'SET_ROOT', rootPitchClass: scaleRootPc });
-                  navigate(`/scale/${rel.scaleId}`);
-                }}
+                onClick={() => navigate(`/scale/${rel.scaleId}`)}
               >
-                {spellingToString(scaleRootSpelling)} {scaleType.name}
+                {scaleType.name} (degree {degreeLabels[degreeIndex]})
               </li>
             );
-          }
-
-          return (
-            <li
-              key={`${rel.scaleId}-${rel.scaleRootPitchClass}`}
-              onClick={() => navigate(`/scale/${rel.scaleId}`)}
-            >
-              {scaleType.name} (degree {degreeLabels[degreeIndex]})
-            </li>
-          );
-        })}
-      </ul>
+          })}
+        </ul>
+      ) : (
+        <p>There are no scales that contain this chord.</p>
+      )}
     </article>
   );
 }

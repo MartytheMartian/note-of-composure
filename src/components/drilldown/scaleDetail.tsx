@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { playNote, playScaleAscending } from '../../audio/audioEngine';
 import AppContext from '../../state/context';
-import { AppMode } from '../../state/types';
+import { AppMode, ListMode } from '../../state/types';
 import { getAbsoluteScale, getRelativeScaleDegreeLabels } from '../../theory/absolute';
 import { RELATIVE_CHORDS } from '../../theory/data/chordTypes';
 import { RELATIVE_SCALES } from '../../theory/data/scaleTypes';
@@ -35,6 +35,11 @@ export default function () {
     (r) => r.chordRootPitchClass,
     (r) => [chordTypeIndexById.get(r.chordId)!],
   );
+  const commonChordRelationships = relationships.filter((r) => r.isDiatonic && !r.isSeventhChord);
+  const otherChordRelationships = relationships.filter((r) => !r.isDiatonic || r.isSeventhChord);
+  const progressionSlots = [...commonChordRelationships]
+    .sort((a, b) => (a.diatonicDegreeIndex ?? 0) - (b.diatonicDegreeIndex ?? 0))
+    .map((r) => ({ chordId: r.chordId, rootOffset: r.chordRootPitchClass }));
 
   useEffect(() => {
     if (!isAbsolute || !noteMidiNotes) return;
@@ -87,43 +92,59 @@ export default function () {
       }
 
       <div className="section-heading">
-        <h3>Diatonic Chords</h3>
-        <SortOrderSelect
-          value={state.chordSortOrder}
-          onChange={(order) => dispatch({ type: 'SET_CHORD_SORT_ORDER', order })}
-          categoryLabel="Family"
-        />
+        <h3>Common Chords</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          {progressionSlots.length > 0 && (
+            <button
+              className="link-button"
+              onClick={() => {
+                dispatch({ type: 'SET_PROGRESSION', slots: progressionSlots });
+                dispatch({ type: 'SET_LIST_MODE', listMode: ListMode.Progressions });
+                navigate('/');
+              }}
+            >
+              Copy to Progressions
+            </button>
+          )}
+          <SortOrderSelect
+            value={state.chordSortOrder}
+            onChange={(order) => dispatch({ type: 'SET_CHORD_SORT_ORDER', order })}
+            categoryLabel="Family"
+          />
+        </div>
       </div>
-      <ul>
-        {relationships
-          .filter((r) => r.isDiatonic)
-          .map((r) => {
-            const chordType = RELATIVE_CHORDS.find((c) => c.id === r.chordId)!;
-            const degreeIndex = scaleType.intervals.indexOf(r.chordRootPitchClass);
-            const label = isAbsolute
-              ? `${spellingToString(toCommonSpelling(absoluteScale!.notes[degreeIndex].spelling))}${chordType.symbol}`
-              : `${degreeLabels[degreeIndex]} ${chordType.name}`;
-            return (
-              <li
-                key={`${r.chordId}-${r.chordRootPitchClass}`}
-                onClick={() => {
-                  if (isAbsolute) {
-                    dispatch({ type: 'SET_ROOT', rootPitchClass: mod(state.rootPitchClass + r.chordRootPitchClass, 12) });
-                  }
-                  navigate(`/chord/${r.chordId}`);
-                }}
-              >
-                {label}
-              </li>
-            );
-          })}
-      </ul>
+      {commonChordRelationships.length > 0 ? (
+        <ul>
+          {commonChordRelationships
+            .map((r) => {
+              const chordType = RELATIVE_CHORDS.find((c) => c.id === r.chordId)!;
+              const degreeIndex = scaleType.intervals.indexOf(r.chordRootPitchClass);
+              const label = isAbsolute
+                ? `${spellingToString(toCommonSpelling(absoluteScale!.notes[degreeIndex].spelling))}${chordType.symbol}`
+                : `${degreeLabels[degreeIndex]} ${chordType.name}`;
+              return (
+                <li
+                  key={`${r.chordId}-${r.chordRootPitchClass}`}
+                  onClick={() => {
+                    if (isAbsolute) {
+                      dispatch({ type: 'SET_ROOT', rootPitchClass: mod(state.rootPitchClass + r.chordRootPitchClass, 12) });
+                    }
+                    navigate(`/chord/${r.chordId}`);
+                  }}
+                >
+                  {label}
+                </li>
+              );
+            })}
+        </ul>
+      ) : (
+        <p>There are no common chords to display for this scale.</p>
+      )}
 
       <h3>Other Chords That Fit This Scale</h3>
-      <ul>
-        {relationships
-          .filter((r) => !r.isDiatonic)
-          .map((r) => {
+      {otherChordRelationships.length > 0 ? (
+        <ul>
+          {otherChordRelationships.map((r) => {
             const chordType = RELATIVE_CHORDS.find((c) => c.id === r.chordId)!;
             const degreeIndex = scaleType.intervals.indexOf(r.chordRootPitchClass);
             const label = isAbsolute
@@ -143,7 +164,10 @@ export default function () {
               </li>
             );
           })}
-      </ul>
+        </ul>
+      ) : (
+        <p>There are no other chords that fit this scale.</p>
+      )}
     </article >
   );
 }
