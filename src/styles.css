@@ -93,6 +93,16 @@ span {
   background-color: var(--bg-surface-hover);
 }
 
+.link-button.is-active {
+  opacity: 1;
+  background-color: var(--color-accent);
+  color: var(--text-primary);
+}
+
+.link-button.is-active:hover {
+  background-color: var(--color-accent-hover);
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;

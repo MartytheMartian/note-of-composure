@@ -61,7 +61,7 @@ export function playChord(notes: AbsoluteNote[], rootPitchClass?: PitchClass): v
   midiNotes.forEach((midi) => playTone(ctx, midi, startTime, 1.2));
 }
 
-export function playChordProgression(chords: AbsoluteNote[][], rootPitchClass: PitchClass): void {
+export function playChordProgression(chords: AbsoluteNote[][], rootPitchClass: PitchClass): number {
   const ctx = getAudioContext();
   const chordDuration = 1.0;
   const rootMidi = midiNote(4, rootPitchClass);
@@ -71,4 +71,6 @@ export function playChordProgression(chords: AbsoluteNote[][], rootPitchClass: P
     const startTime = ctx.currentTime + i * chordDuration;
     midiNotes.forEach((midi) => playTone(ctx, midi, startTime, chordDuration * 1.1));
   });
+
+  return chords.length * chordDuration;
 }

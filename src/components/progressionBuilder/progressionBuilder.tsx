@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { playChord, playChordProgression } from '../../audio/audioEngine';
 import AppContext from '../../state/context';
@@ -49,6 +49,7 @@ export default function () {
   const { state, dispatch } = useContext(AppContext);
   const navigate = useNavigate();
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [isLooping, setIsLooping] = useState(false);
 
   const isAbsolute = state.mode === AppMode.Absolute;
   const progressionRootPc = isAbsolute ? state.rootPitchClass : 0;
@@ -84,6 +85,27 @@ export default function () {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isAbsolute, resolvedSlots]);
+
+  const loopStateRef = useRef({ resolvedSlots, progressionRootPc });
+  loopStateRef.current = { resolvedSlots, progressionRootPc };
+
+  useEffect(() => {
+    if (!isLooping) return;
+
+    let timeoutId: number;
+    function playAndScheduleNext() {
+      const { resolvedSlots, progressionRootPc } = loopStateRef.current;
+      const duration = playChordProgression(resolvedSlots.map((r) => r.absoluteChord.notes), progressionRootPc);
+      timeoutId = window.setTimeout(playAndScheduleNext, duration * 1000);
+    }
+    playAndScheduleNext();
+
+    return () => window.clearTimeout(timeoutId);
+  }, [isLooping]);
+
+  useEffect(() => {
+    if (!isAbsolute) setIsLooping(false);
+  }, [isAbsolute]);
 
   function toggleEditing(index: number) {
     setEditingIndex(editingIndex === index ? null : index);
@@ -147,6 +169,14 @@ export default function () {
           onClick={() => playChordProgression(resolvedSlots.map((r) => r.absoluteChord.notes), progressionRootPc)}
         >
           ▶ Play Progression
+        </button>
+
+        <button
+          className={`link-button${isLooping ? ' is-active' : ''}`}
+          disabled={!isAbsolute}
+          onClick={() => setIsLooping((prev) => !prev)}
+        >
+          ⟲ Loop Progression
         </button>
       </div>
 
