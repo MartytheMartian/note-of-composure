@@ -17,6 +17,13 @@ function midiToFrequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
+interface ActiveTone {
+  oscillator: OscillatorNode;
+  gain: GainNode;
+}
+
+let activeTones: ActiveTone[] = [];
+
 function playTone(ctx: AudioContext, midi: number, startTime: number, duration: number): void {
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -32,6 +39,24 @@ function playTone(ctx: AudioContext, midi: number, startTime: number, duration: 
   gain.connect(ctx.destination);
   oscillator.start(startTime);
   oscillator.stop(startTime + duration + 0.05);
+
+  const tone: ActiveTone = { oscillator, gain };
+  activeTones.push(tone);
+  oscillator.addEventListener('ended', () => {
+    activeTones = activeTones.filter((t) => t !== tone);
+  });
+}
+
+export function stopAllTones(): void {
+  const ctx = getAudioContext();
+  const now = ctx.currentTime;
+  for (const { oscillator, gain } of activeTones) {
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(gain.gain.value, now);
+    gain.gain.linearRampToValueAtTime(0, now + 0.03);
+    oscillator.stop(now + 0.03);
+  }
+  activeTones = [];
 }
 
 export function playNote(midi: number): void {

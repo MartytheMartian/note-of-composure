@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { playChord, playChordProgression } from '../../audio/audioEngine';
+import { playChord, playChordProgression, stopAllTones } from '../../audio/audioEngine';
 import AppContext from '../../state/context';
 import { AppMode } from '../../state/types';
 import { getAbsoluteChord } from '../../theory/absolute';
@@ -100,7 +100,10 @@ export default function () {
     }
     playAndScheduleNext();
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      window.clearTimeout(timeoutId);
+      stopAllTones();
+    };
   }, [isLooping]);
 
   useEffect(() => {
@@ -140,6 +143,7 @@ export default function () {
           <p>
             Further down, a library of common chord progressions lets you load a ready-made preset.
           </p>
+          <p>If you have access to a keyboard, use the number keys to play the corresponding chord in the progression.</p>
         </InfoButton>
       </div>
 
