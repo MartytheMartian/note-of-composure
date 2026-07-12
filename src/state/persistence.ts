@@ -1,3 +1,4 @@
+import { MAX_PROGRESSION_SLOTS, MIN_PROGRESSION_SLOTS } from '../theory/data/progressionTypes';
 import { AppMode, DEFAULT_APP_STATE, ListMode, ListSortOrder, type AppState } from './types';
 
 const STORAGE_KEY = 'note-of-composure:v1';
@@ -16,6 +17,12 @@ export function loadPersistedState(): AppState {
       lastPath: typeof parsed.lastPath === 'string' ? parsed.lastPath : '/',
       scaleSortOrder: Object.values(ListSortOrder).includes(parsed.scaleSortOrder) ? parsed.scaleSortOrder : ListSortOrder.Root,
       chordSortOrder: Object.values(ListSortOrder).includes(parsed.chordSortOrder) ? parsed.chordSortOrder : ListSortOrder.Root,
+      progression:
+        Array.isArray(parsed.progression) &&
+        parsed.progression.length >= MIN_PROGRESSION_SLOTS &&
+        parsed.progression.length <= MAX_PROGRESSION_SLOTS
+          ? parsed.progression
+          : DEFAULT_APP_STATE.progression,
     };
   } catch {
     return DEFAULT_APP_STATE;

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { playChord, playNote } from '../../audio/audioEngine';
 import AppContext from '../../state/context';
@@ -35,6 +35,22 @@ export default function () {
     (rel) => rel.scaleRootPitchClass,
     (rel) => [scaleSortPriority(rel.scaleId), scaleTypeIndexById.get(rel.scaleId)!],
   );
+
+  useEffect(() => {
+    if (!isAbsolute || !noteMidiNotes) return;
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.target instanceof HTMLElement && ['SELECT', 'INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+      const index = Number(e.key) - 1;
+      if (Number.isInteger(index) && index >= 0 && index < noteMidiNotes!.length) {
+        playNote(noteMidiNotes![index]);
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isAbsolute, noteMidiNotes]);
 
   return (
     <article className="chord-detail">

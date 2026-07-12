@@ -19,6 +19,7 @@ export default function () {
       <option value={ListMode.Scales}>Scales</option>
       <option value={ListMode.Chords}>Chords</option>
       <option value={ListMode.Notes}>Notes</option>
+      <option value={ListMode.Progressions}>Progressions</option>
     </select>
   );
 }
