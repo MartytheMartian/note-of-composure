@@ -6,7 +6,7 @@ import { AppMode } from '../../state/types';
 import { getAbsoluteScale, getRelativeScaleDegreeLabels } from '../../theory/absolute';
 import { RELATIVE_CHORDS } from '../../theory/data/chordTypes';
 import { RELATIVE_SCALES } from '../../theory/data/scaleTypes';
-import { mod, ROOTS, spellingToString } from '../../theory/notes';
+import { mod, ROOTS, spellingToString, toCommonSpelling } from '../../theory/notes';
 import { getChordsInScale } from '../../theory/relationshipIndex';
 import { assignOctaves } from '../../theory/sequence';
 import { sortRootedItems } from '../../theory/sortOrder';
@@ -70,7 +70,7 @@ export default function () {
             className={isAbsolute ? 'note-row is-playable' : 'note-row'}
             onClick={isAbsolute ? () => playNote(noteMidiNotes![i]) : undefined}
           >
-            {isAbsolute ? `${spellingToString(absoluteScale!.notes[i].spelling)} (${degreeLabels[i]})` : `(${degreeLabels[i]})`}
+            {isAbsolute ? `${spellingToString(toCommonSpelling(absoluteScale!.notes[i].spelling))} (${degreeLabels[i]})` : `(${degreeLabels[i]})`}
           </li>
         ))}
       </ul>
@@ -101,7 +101,7 @@ export default function () {
             const chordType = RELATIVE_CHORDS.find((c) => c.id === r.chordId)!;
             const degreeIndex = scaleType.intervals.indexOf(r.chordRootPitchClass);
             const label = isAbsolute
-              ? `${spellingToString(absoluteScale!.notes[degreeIndex].spelling)}${chordType.symbol}`
+              ? `${spellingToString(toCommonSpelling(absoluteScale!.notes[degreeIndex].spelling))}${chordType.symbol}`
               : `${degreeLabels[degreeIndex]} ${chordType.name}`;
             return (
               <li
@@ -127,7 +127,7 @@ export default function () {
             const chordType = RELATIVE_CHORDS.find((c) => c.id === r.chordId)!;
             const degreeIndex = scaleType.intervals.indexOf(r.chordRootPitchClass);
             const label = isAbsolute
-              ? `${spellingToString(absoluteScale!.notes[degreeIndex].spelling)}${chordType.symbol}`
+              ? `${spellingToString(toCommonSpelling(absoluteScale!.notes[degreeIndex].spelling))}${chordType.symbol}`
               : `${degreeLabels[degreeIndex]} ${chordType.name}`;
             return (
               <li
