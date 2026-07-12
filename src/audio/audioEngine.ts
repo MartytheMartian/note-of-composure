@@ -47,9 +47,16 @@ export function playScaleAscending(notes: AbsoluteNote[]): void {
   resolvedMidiNotes.forEach((midi, i) => playTone(ctx, midi, ctx.currentTime + i * noteDuration, noteDuration * 1.5));
 }
 
-export function playChord(notes: AbsoluteNote[]): void {
+function anchorAboveRoot(midiNotes: number[], rootMidi: number): number[] {
+  return midiNotes[0] < rootMidi ? midiNotes.map((midi) => midi + 12) : midiNotes;
+}
+
+export function playChord(notes: AbsoluteNote[], rootPitchClass?: PitchClass): void {
   const ctx = getAudioContext();
-  const midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
+  let midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
+  if (rootPitchClass !== undefined) {
+    midiNotes = anchorAboveRoot(midiNotes, midiNote(4, rootPitchClass));
+  }
   const startTime = ctx.currentTime;
   midiNotes.forEach((midi) => playTone(ctx, midi, startTime, 1.2));
 }
@@ -60,10 +67,7 @@ export function playChordProgression(chords: AbsoluteNote[][], rootPitchClass: P
   const rootMidi = midiNote(4, rootPitchClass);
 
   chords.forEach((notes, i) => {
-    const midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
-    if (midiNotes[0] < rootMidi) {
-      for (let j = 0; j < midiNotes.length; j++) midiNotes[j] += 12;
-    }
+    const midiNotes = anchorAboveRoot(assignOctaves(notes.map((n) => n.pitchClass)), rootMidi);
     const startTime = ctx.currentTime + i * chordDuration;
     midiNotes.forEach((midi) => playTone(ctx, midi, startTime, chordDuration * 1.1));
   });

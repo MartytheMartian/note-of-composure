@@ -77,7 +77,7 @@ export default function () {
       if (e.target instanceof HTMLElement && ['SELECT', 'INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
       const index = KEY_TO_SLOT_INDEX[e.key];
       if (index !== undefined && index < resolvedSlots.length) {
-        playChord(resolvedSlots[index].absoluteChord.notes);
+        playChord(resolvedSlots[index].absoluteChord.notes, progressionRootPc);
       }
     }
 
@@ -192,7 +192,7 @@ export default function () {
           <button
             className="link-button"
             disabled={!isAbsolute}
-            onClick={() => playChord(resolvedSlots[editingIndex].absoluteChord.notes)}
+            onClick={() => playChord(resolvedSlots[editingIndex].absoluteChord.notes, progressionRootPc)}
           >
             ▶ Play Chord
           </button>
