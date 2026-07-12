@@ -60,4 +60,14 @@ export function chromaticIntervalLabel(offset: PitchClass): string {
   return CHROMATIC_INTERVAL_LABELS[mod(offset, 12)];
 }
 
+const ROMAN_NUMERALS = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+
+export function romanNumeralLabel(offset: PitchClass, isMinorQuality: boolean): string {
+  const label = chromaticIntervalLabel(offset);
+  const flat = label.startsWith('b') ? 'b' : '';
+  const digit = flat ? label.slice(1) : label;
+  const roman = ROMAN_NUMERALS[Number(digit)];
+  return flat + (isMinorQuality ? roman.toLowerCase() : roman);
+}
+
 export { letterIndexAfterSteps, mod };

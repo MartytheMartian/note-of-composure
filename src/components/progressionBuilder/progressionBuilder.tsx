@@ -7,7 +7,7 @@ import { getAbsoluteChord } from '../../theory/absolute';
 import { RELATIVE_CHORDS } from '../../theory/data/chordTypes';
 import { MAX_PROGRESSION_SLOTS, MIN_PROGRESSION_SLOTS, RELATIVE_PROGRESSIONS } from '../../theory/data/progressionTypes';
 import { RELATIVE_SCALES, scaleSortPriority } from '../../theory/data/scaleTypes';
-import { chromaticIntervalLabel, mod, ROOTS, spellingToString } from '../../theory/notes';
+import { chromaticIntervalLabel, mod, romanNumeralLabel, ROOTS, spellingToString } from '../../theory/notes';
 import { findScalesContainingNotes } from '../../theory/relationshipIndex';
 import { sortRootedItems } from '../../theory/sortOrder';
 import type { ChordCategory, RelativeChordDefinition } from '../../theory/types';
@@ -27,6 +27,11 @@ function groupChordsByCategory(): Map<ChordCategory, RelativeChordDefinition[]> 
 }
 
 const chordGroups = groupChordsByCategory();
+
+function diminishedSuffix(chordType: RelativeChordDefinition): string {
+  if (chordType.intervals[2] !== 6) return '';
+  return chordType.intervals[3] === 10 ? 'ø' : '°';
+}
 
 const KEY_TO_SLOT_INDEX: Record<string, number> = {
   '1': 0,
@@ -152,9 +157,15 @@ export default function () {
         <ul>
           {resolvedSlots.map(({ slot, chordType, rootSpelling }, i) => (
             <li key={i} onClick={() => toggleEditing(i)}>
-              {isAbsolute
-                ? `${spellingToString(rootSpelling)}${chordType.symbol}`
-                : `${chromaticIntervalLabel(slot.rootOffset)} ${chordType.name}`}
+              <div>
+                {isAbsolute
+                  ? `${spellingToString(rootSpelling)}${chordType.symbol}`
+                  : `${chromaticIntervalLabel(slot.rootOffset)} ${chordType.name}`}
+              </div>
+              <div className="chord-chip-degree">
+                {romanNumeralLabel(slot.rootOffset, chordType.intervals[1] === 3)}
+                {diminishedSuffix(chordType)}
+              </div>
             </li>
           ))}
         </ul>

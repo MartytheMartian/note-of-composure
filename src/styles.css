@@ -298,6 +298,12 @@ span {
   overflow: hidden;
 }
 
+.chord-chip-degree {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
+}
+
 .scale-detail li:not(.note-row),
 .chord-detail li:not(.note-row),
 .list-group li {
