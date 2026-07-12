@@ -93,6 +93,16 @@ span {
   background-color: var(--bg-surface-hover);
 }
 
+.link-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.link-button:disabled:hover {
+  opacity: 0.35;
+  background-color: transparent;
+}
+
 .link-button.is-active {
   opacity: 1;
   background-color: var(--color-accent);
