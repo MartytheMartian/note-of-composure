@@ -32,6 +32,14 @@ export function spellingToString(spelling: NoteSpelling): string {
   return `${spelling.letter}${ACCIDENTAL_SYMBOLS[spelling.accidental]}`;
 }
 
+export function toCommonSpelling(spelling: NoteSpelling): NoteSpelling {
+  const isDoubleAccidental = Math.abs(spelling.accidental) === 2;
+  const isUncommonSharp = spelling.accidental === 1 && (spelling.letter === 'E' || spelling.letter === 'B');
+  const isUncommonFlat = spelling.accidental === -1 && (spelling.letter === 'C' || spelling.letter === 'F');
+  if (!isDoubleAccidental && !isUncommonSharp && !isUncommonFlat) return spelling;
+  return ROOTS[pitchClassOfSpelling(spelling)].spellings[0];
+}
+
 function letterIndexAfterSteps(fromLetter: Letter, steps: number): number {
   return mod(LETTER_CYCLE.indexOf(fromLetter) + steps, 7);
 }

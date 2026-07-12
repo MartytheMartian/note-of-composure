@@ -6,7 +6,7 @@ import { AppMode } from '../../state/types';
 import { getAbsoluteChord, getRelativeScaleDegreeLabels } from '../../theory/absolute';
 import { RELATIVE_CHORDS } from '../../theory/data/chordTypes';
 import { RELATIVE_SCALES, scaleSortPriority } from '../../theory/data/scaleTypes';
-import { mod, ROOTS, spellingToString } from '../../theory/notes';
+import { mod, ROOTS, spellingToString, toCommonSpelling } from '../../theory/notes';
 import { getScalesContainingChord } from '../../theory/relationshipIndex';
 import { assignOctaves } from '../../theory/sequence';
 import { sortRootedItems } from '../../theory/sortOrder';
@@ -70,7 +70,7 @@ export default function () {
             className={isAbsolute ? 'note-row is-playable' : 'note-row'}
             onClick={isAbsolute ? () => playNote(noteMidiNotes![i]) : undefined}
           >
-            {isAbsolute ? `${spellingToString(absoluteChord!.notes[i].spelling)} (${chordType.degreeLabels[i]})` : `(${chordType.degreeLabels[i]})`}
+            {isAbsolute ? `${spellingToString(toCommonSpelling(absoluteChord!.notes[i].spelling))} (${chordType.degreeLabels[i]})` : `(${chordType.degreeLabels[i]})`}
           </li>
         ))}
       </ul>
