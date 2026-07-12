@@ -1,5 +1,5 @@
-import { assignOctaves } from '../theory/sequence';
-import type { AbsoluteNote } from '../theory/types';
+import { assignOctaves, midiNote } from '../theory/sequence';
+import type { AbsoluteNote, PitchClass } from '../theory/types';
 
 let audioContext: AudioContext | undefined;
 
@@ -52,4 +52,19 @@ export function playChord(notes: AbsoluteNote[]): void {
   const midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
   const startTime = ctx.currentTime;
   midiNotes.forEach((midi) => playTone(ctx, midi, startTime, 1.2));
+}
+
+export function playChordProgression(chords: AbsoluteNote[][], rootPitchClass: PitchClass): void {
+  const ctx = getAudioContext();
+  const chordDuration = 1.0;
+  const rootMidi = midiNote(4, rootPitchClass);
+
+  chords.forEach((notes, i) => {
+    const midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
+    if (midiNotes[0] < rootMidi) {
+      for (let j = 0; j < midiNotes.length; j++) midiNotes[j] += 12;
+    }
+    const startTime = ctx.currentTime + i * chordDuration;
+    midiNotes.forEach((midi) => playTone(ctx, midi, startTime, chordDuration * 1.1));
+  });
 }

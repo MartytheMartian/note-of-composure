@@ -54,4 +54,10 @@ export const ROOTS: RootDefinition[] = Array.from({ length: 12 }, (_, pitchClass
   return { pitchClass, spellings };
 });
 
+const CHROMATIC_INTERVAL_LABELS = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'];
+
+export function chromaticIntervalLabel(offset: PitchClass): string {
+  return CHROMATIC_INTERVAL_LABELS[mod(offset, 12)];
+}
+
 export { letterIndexAfterSteps, mod };
