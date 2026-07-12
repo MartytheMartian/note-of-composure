@@ -52,6 +52,17 @@ export interface RelativeChordDefinition {
   degreeLetterSteps: number[];
 }
 
+export interface ProgressionSlotDefinition {
+  chordId: string;
+  rootOffset: PitchClass;
+}
+
+export interface RelativeProgressionDefinition {
+  id: string;
+  name: string;
+  slots: ProgressionSlotDefinition[];
+}
+
 export interface RootDefinition {
   pitchClass: PitchClass;
   spellings: NoteSpelling[];

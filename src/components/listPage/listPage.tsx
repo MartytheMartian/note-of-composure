@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AppContext from '../../state/context';
 import { ListMode } from '../../state/types';
 import NotesFinder from '../notesFinder/notesFinder';
+import ProgressionBuilder from '../progressionBuilder/progressionBuilder';
 import { RELATIVE_CHORDS } from '../../theory/data/chordTypes';
 import { RELATIVE_SCALES } from '../../theory/data/scaleTypes';
 import type { ChordCategory, RelativeChordDefinition, RelativeScaleDefinition, ScaleCategory } from '../../theory/types';
@@ -31,6 +32,10 @@ export default function () {
 
   if (state.listMode === ListMode.Notes) {
     return <NotesFinder />;
+  }
+
+  if (state.listMode === ListMode.Progressions) {
+    return <ProgressionBuilder />;
   }
 
   return (
