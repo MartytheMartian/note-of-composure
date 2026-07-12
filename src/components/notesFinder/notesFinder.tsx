@@ -8,7 +8,6 @@ import { ROOTS, spellingToString } from '../../theory/notes';
 import { findChordsContainingNotes, findScalesContainingNotes } from '../../theory/relationshipIndex';
 import { sortRootedItems } from '../../theory/sortOrder';
 import type { PitchClass, RelativeChordDefinition, RelativeScaleDefinition } from '../../theory/types';
-import InfoButton from '../common/infoButton/infoButton';
 import SortOrderSelect from '../sortOrderSelect/sortOrderSelect';
 
 const scaleTypeById = new Map(RELATIVE_SCALES.map((s, index) => [s.id, { def: s, index }]));
@@ -76,19 +75,7 @@ export default function () {
 
   return (
     <article className="list-page">
-      <div className="page-heading">
-        <h2>Notes</h2>
-        <InfoButton title="Notes">
-          <p>
-            Click the note buttons below to build a set of pitch classes, selecting at least two notes to see any
-            matches.
-          </p>
-          <p>
-            Every scale and chord that contains all of your selected notes is listed underneath, sorted using the
-            dropdown in each section's corner. Clicking a result opens a detailed view of the scale or chord.
-            </p>
-        </InfoButton>
-      </div>
+      <h2>Notes</h2>
       <ul className="note-picker">
         {ROOTS.map((root) => (
           <li key={root.pitchClass}>

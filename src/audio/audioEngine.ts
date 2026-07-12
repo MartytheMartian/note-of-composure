@@ -1,5 +1,5 @@
-import { assignOctaves, midiNote } from '../theory/sequence';
-import type { AbsoluteNote, PitchClass } from '../theory/types';
+import { assignOctaves } from '../theory/sequence';
+import type { AbsoluteNote } from '../theory/types';
 
 let audioContext: AudioContext | undefined;
 
@@ -17,13 +17,6 @@ function midiToFrequency(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-interface ActiveTone {
-  oscillator: OscillatorNode;
-  gain: GainNode;
-}
-
-let activeTones: ActiveTone[] = [];
-
 function playTone(ctx: AudioContext, midi: number, startTime: number, duration: number): void {
   const oscillator = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -39,24 +32,6 @@ function playTone(ctx: AudioContext, midi: number, startTime: number, duration: 
   gain.connect(ctx.destination);
   oscillator.start(startTime);
   oscillator.stop(startTime + duration + 0.05);
-
-  const tone: ActiveTone = { oscillator, gain };
-  activeTones.push(tone);
-  oscillator.addEventListener('ended', () => {
-    activeTones = activeTones.filter((t) => t !== tone);
-  });
-}
-
-export function stopAllTones(): void {
-  const ctx = getAudioContext();
-  const now = ctx.currentTime;
-  for (const { oscillator, gain } of activeTones) {
-    gain.gain.cancelScheduledValues(now);
-    gain.gain.setValueAtTime(gain.gain.value, now);
-    gain.gain.linearRampToValueAtTime(0, now + 0.03);
-    oscillator.stop(now + 0.03);
-  }
-  activeTones = [];
 }
 
 export function playNote(midi: number): void {
@@ -72,30 +47,9 @@ export function playScaleAscending(notes: AbsoluteNote[]): void {
   resolvedMidiNotes.forEach((midi, i) => playTone(ctx, midi, ctx.currentTime + i * noteDuration, noteDuration * 1.5));
 }
 
-function anchorAboveRoot(midiNotes: number[], rootMidi: number): number[] {
-  return midiNotes[0] < rootMidi ? midiNotes.map((midi) => midi + 12) : midiNotes;
-}
-
-export function playChord(notes: AbsoluteNote[], rootPitchClass?: PitchClass): void {
+export function playChord(notes: AbsoluteNote[]): void {
   const ctx = getAudioContext();
-  let midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
-  if (rootPitchClass !== undefined) {
-    midiNotes = anchorAboveRoot(midiNotes, midiNote(4, rootPitchClass));
-  }
+  const midiNotes = assignOctaves(notes.map((n) => n.pitchClass));
   const startTime = ctx.currentTime;
   midiNotes.forEach((midi) => playTone(ctx, midi, startTime, 1.2));
-}
-
-export function playChordProgression(chords: AbsoluteNote[][], rootPitchClass: PitchClass): number {
-  const ctx = getAudioContext();
-  const chordDuration = 1.0;
-  const rootMidi = midiNote(4, rootPitchClass);
-
-  chords.forEach((notes, i) => {
-    const midiNotes = anchorAboveRoot(assignOctaves(notes.map((n) => n.pitchClass)), rootMidi);
-    const startTime = ctx.currentTime + i * chordDuration;
-    midiNotes.forEach((midi) => playTone(ctx, midi, startTime, chordDuration * 1.1));
-  });
-
-  return chords.length * chordDuration;
 }
