@@ -1,5 +1,4 @@
-import { RELATIVE_PROGRESSIONS } from '../theory/data/progressionTypes';
-import type { PitchClass, ProgressionSlotDefinition } from '../theory/types';
+import type { PitchClass } from '../theory/types';
 
 export const AppMode = {
   Relative: 'Relative',
@@ -11,7 +10,6 @@ export const ListMode = {
   Scales: 'Scales',
   Chords: 'Chords',
   Notes: 'Notes',
-  Progressions: 'Progressions',
 } as const;
 export type ListMode = (typeof ListMode)[keyof typeof ListMode];
 
@@ -28,7 +26,6 @@ export interface AppState {
   lastPath: string;
   scaleSortOrder: ListSortOrder;
   chordSortOrder: ListSortOrder;
-  progression: ProgressionSlotDefinition[];
 }
 
 export type AppAction =
@@ -38,10 +35,6 @@ export type AppAction =
   | { type: 'SET_LAST_PATH'; path: string }
   | { type: 'SET_SCALE_SORT_ORDER'; order: ListSortOrder }
   | { type: 'SET_CHORD_SORT_ORDER'; order: ListSortOrder }
-  | { type: 'SET_PROGRESSION_SLOT'; index: number; slot: ProgressionSlotDefinition }
-  | { type: 'SET_PROGRESSION'; slots: ProgressionSlotDefinition[] }
-  | { type: 'ADD_PROGRESSION_SLOT' }
-  | { type: 'REMOVE_PROGRESSION_SLOT'; index: number }
   | { type: 'HYDRATE'; state: AppState };
 
 export const DEFAULT_APP_STATE: AppState = {
@@ -51,5 +44,4 @@ export const DEFAULT_APP_STATE: AppState = {
   lastPath: '/',
   scaleSortOrder: ListSortOrder.Root,
   chordSortOrder: ListSortOrder.Root,
-  progression: RELATIVE_PROGRESSIONS[0].slots,
 };
